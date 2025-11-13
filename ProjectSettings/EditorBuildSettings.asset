@@ -14,4 +14,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/TreeLevel.unity
     guid: 977a98eaa70892540bd555d01f05e2d0
+  - enabled: 1
+    path: Assets/Scenes/ChestLevel.unity
+    guid: ac7288de52aa74f4ba8253d4471c5d41
   m_configObjects: {}
