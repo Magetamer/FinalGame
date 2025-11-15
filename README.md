@@ -3,3 +3,5 @@ Portal objects are indicated with a floating gem above their sprite to let you k
 The game is currently a work in progress and still needs an end goal and more interactive systems
 
 There is health in the game, but currently the only sources of damage are spike traps that instakill you, I will add other forms of damage and a way to heal at a later time
+
+Gameplay demo: https://youtu.be/BKKb5xFWudA
