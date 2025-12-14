@@ -7,6 +7,7 @@ public class StartMenuController : MonoBehaviour
 {
    public void OnStartClick()
     {
+        PlayerPrefs.DeleteAll();
         SceneManager.LoadScene("HubWorld");
     }
 

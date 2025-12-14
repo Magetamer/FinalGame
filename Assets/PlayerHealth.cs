@@ -1,6 +1,5 @@
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerHealth : MonoBehaviour
@@ -14,24 +13,33 @@ public class PlayerHealth : MonoBehaviour
 
     public static event Action OnPlayerDied;
 
-    // Start is called before the first frame update
+    private bool isDead = false; // prevent multiple death triggers
+
     void Start()
     {
         ResetHealth();
-
         spriteRenderer = GetComponent<SpriteRenderer>();
+
         GameController.OnReset += ResetHealth;
+    }
+
+    private void OnDestroy()
+    {
+        GameController.OnReset -= ResetHealth;
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
+        if (isDead) return;
+
         Enemy enemy = collision.GetComponent<Enemy>();
-        if (enemy)
+        if (enemy != null)
         {
             TakeDamage(enemy.damage);
         }
+
         Trap trap = collision.GetComponent<Trap>();
-        if (trap && trap.damage > 0)
+        if (trap != null && trap.damage > 0)
         {
             TakeDamage(trap.damage);
         }
@@ -40,27 +48,36 @@ public class PlayerHealth : MonoBehaviour
     void ResetHealth()
     {
         currentHealth = maxHealth;
-        healthUI.SetMaxHearts(maxHealth);
+        if (healthUI != null)
+            healthUI.SetMaxHearts(maxHealth);
+
+        isDead = false;
     }
 
     private void TakeDamage(int damage)
     {
-        currentHealth -= damage;
-        healthUI.UpdateHearts(currentHealth);
+        if (isDead) return;
 
-        //Flash Red
+        currentHealth -= damage;
+        if (healthUI != null)
+            healthUI.UpdateHearts(currentHealth);
+
         StartCoroutine(FlashRed());
 
-        if (currentHealth < 1) 
+        if (currentHealth < 1 && !isDead)
         {
-            OnPlayerDied.Invoke();
+            isDead = true;
+            OnPlayerDied?.Invoke(); // null-safe
         }
     }
 
     private IEnumerator FlashRed()
     {
-        spriteRenderer.color = Color.red;
-        yield return new WaitForSeconds(0.2f);
-        spriteRenderer.color = Color.white;
+        if (spriteRenderer != null)
+        {
+            spriteRenderer.color = Color.red;
+            yield return new WaitForSeconds(0.2f);
+            spriteRenderer.color = Color.white;
+        }
     }
 }

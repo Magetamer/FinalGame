@@ -17,4 +17,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/ChestLevel.unity
     guid: ac7288de52aa74f4ba8253d4471c5d41
+  - enabled: 1
+    path: Assets/Scenes/DashLevel.unity
+    guid: ca84ea52542ab7a4e88e98a402620dab
   m_configObjects: {}

@@ -14,6 +14,14 @@ public class PlayerMovement : MonoBehaviour
     public float moveSpeed = 5f;
     float horizontalMovement;
 
+    [Header("Dashing")]
+    public float dashSpeed = 20f;
+    public float dashDuration = 0.1f;
+    public float dashCooldown = 0.1f;
+    bool isDashing;
+    bool canDash = true;
+    TrailRenderer trailRenderer;
+
     [Header("Jumping")]
     public float jumpPower = 10f;
     public int maxJumps = 2;
@@ -45,11 +53,26 @@ public class PlayerMovement : MonoBehaviour
     float wallJumpTime = 0.5f;
     float wallJumpTimer;
     public Vector2 wallJumpPower = new Vector2(5f, 10f);
- 
+
+    bool dashUnlocked;
+
+    private void Start()
+    {
+        trailRenderer  = GetComponent<TrailRenderer>();
+        dashUnlocked = PlayerPrefs.GetInt("DashUnlocked", 0) == 1;
+    }
+
     // Update is called once per frame
     void Update()
     {
-        
+        animator.SetFloat("yVelocity", rb.velocity.y);
+        animator.SetFloat("magnitude", rb.velocity.magnitude);
+        animator.SetBool("isWallSliding", isWallSliding);
+
+        if (isDashing)
+        {
+            return;
+        }
 
         GroundCheck();
         Gravity();
@@ -62,9 +85,7 @@ public class PlayerMovement : MonoBehaviour
             rb.velocity = new Vector2(horizontalMovement * moveSpeed, rb.velocity.y);
             Flip();
         }
-        animator.SetFloat("yVelocity", rb.velocity.y);
-        animator.SetFloat("magnitude", rb.velocity.magnitude);
-        animator.SetBool("isWallSliding", isWallSliding);
+        
     }
 
 
@@ -73,6 +94,39 @@ public class PlayerMovement : MonoBehaviour
         horizontalMovement = context.ReadValue<Vector2>().x;
     }
 
+    public void Dash(InputAction.CallbackContext context)
+    {
+        dashUnlocked = PlayerPrefs.GetInt("DashUnlocked", 0) == 1;
+
+        if (!dashUnlocked)
+            return;
+
+        if (context.performed && canDash)
+        {
+            StartCoroutine(DashCoroutine());
+        }
+    }
+
+    private IEnumerator DashCoroutine()
+    {
+        canDash = false;
+        isDashing = true;
+
+        trailRenderer.emitting = true;
+        float dashDirection = isFacingRight ? 1f : -1f;
+
+        rb.velocity = new Vector2(dashDirection * dashSpeed, rb.velocity.y);
+
+        yield return new WaitForSeconds(dashDuration);
+
+        rb.velocity = new Vector2(0f, rb.velocity.y); // Reset hori velocitu
+
+        isDashing = false;
+        trailRenderer.emitting = false;
+
+        yield return new WaitForSeconds(dashCooldown);
+        canDash = true;
+    }
     public void Jump(InputAction.CallbackContext context)
     {
         if (jumpsRemaining > 0)
