@@ -119,7 +119,7 @@ public class PlayerMovement : MonoBehaviour
 
         yield return new WaitForSeconds(dashDuration);
 
-        rb.velocity = new Vector2(0f, rb.velocity.y); // Reset hori velocitu
+        rb.velocity = new Vector2(0f, rb.velocity.y); // Reset hori velocity
 
         isDashing = false;
         trailRenderer.emitting = false;

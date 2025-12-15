@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using TreeEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -32,7 +31,7 @@ public class SceneLoader : MonoBehaviour
 
         if (otherObject != null)
         {
-            otherObject.SetActive(PlayerPrefs.GetInt("disableObjectKey", 0) == 0);
+            otherObject.SetActive(PlayerPrefs.GetInt(disableObjectKey, 0) == 0);
         }
 
         // Disable portal if it requires both levels and they aren't done yet
@@ -69,8 +68,8 @@ public class SceneLoader : MonoBehaviour
 
         if (otherObject != null)
         {
-            otherObject.SetActive(false); // disable object, to hide gem to indicate level was already accessed
-            PlayerPrefs.SetInt("disableObjectKey", 1);
+            otherObject.SetActive(false); //hide gem to indicate level was already accessed
+            PlayerPrefs.SetInt(disableObjectKey, 1);
             PlayerPrefs.Save();
         }
 

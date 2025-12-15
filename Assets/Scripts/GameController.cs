@@ -18,25 +18,39 @@ public class GameController : MonoBehaviour
     public GameObject gameOverScreen;
     public TMP_Text gameOverText;
 
+    [Header("Win Screen")]
+    public GameObject winScreen;
+
     public static event Action OnReset;
+    public static event Action OnPlayerWin;
 
     void Start()
     {
         progressAmount = 0;
-        progressSlider.value = 0;
+        if (progressSlider != null)
+            progressSlider.value = 0;
+
         Gem.OnGemCollect += IncreaseProgressAmount;
         HoldToLoad.OnHoldComplete += LoadNextLevel;
-        loadCanvas.SetActive(false);
+
+        loadCanvas?.SetActive(false);
 
         PlayerHealth.OnPlayerDied += GameOverScreen;
-        gameOverScreen.SetActive(false);
+        gameOverScreen?.SetActive(false);
+
+        OnPlayerWin += WinScreen;
+        winScreen?.SetActive(false);
     }
 
     private void OnDestroy()
     {
-        // Unsubscribe from static events
+        Gem.OnGemCollect -= IncreaseProgressAmount;
+        HoldToLoad.OnHoldComplete -= LoadNextLevel;
         PlayerHealth.OnPlayerDied -= GameOverScreen;
+        OnPlayerWin -= WinScreen;
     }
+
+    //Game Over Screen
 
     void GameOverScreen()
     {
@@ -49,8 +63,8 @@ public class GameController : MonoBehaviour
 
     public void ResetGame()
     {
-        if (gameOverScreen != null)
-            gameOverScreen.SetActive(false);
+        gameOverScreen?.SetActive(false);
+        winScreen?.SetActive(false);
 
         MusicManager.PlayBackgroundMusic(true);
         Time.timeScale = 1;
@@ -58,37 +72,46 @@ public class GameController : MonoBehaviour
         PlayerPrefs.DeleteAll();
         Debug.Log("Retry: All PlayerPrefs cleared.");
 
-        // Wait until scene is fully loaded to invoke OnReset
         SceneManager.sceneLoaded += OnSceneLoaded;
-        SceneManager.LoadScene(1);
+        SceneManager.LoadScene(1); // HubWorld scene index
     }
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
         OnReset?.Invoke();
-        SceneManager.sceneLoaded -= OnSceneLoaded; 
+        SceneManager.sceneLoaded -= OnSceneLoaded;
     }
 
+    // Win Screen for final gem collect
+
+    void WinScreen()
+    {
+        if (winScreen != null)
+            winScreen.SetActive(true);
+
+        MusicManager.PauseBackgroundMusic();
+        Time.timeScale = 0;
+    }
+
+    // Leftover code, mostly not used
     void IncreaseProgressAmount(int amount)
     {
         progressAmount += amount;
+
         if (progressSlider != null)
             progressSlider.value = progressAmount;
 
         if (progressAmount >= 100)
         {
             MarkLevelCompleted();
-            if (loadCanvas != null)
-                loadCanvas.SetActive(true);
-
+            loadCanvas?.SetActive(true);
             Debug.Log("Level Complete!");
         }
     }
 
     void LoadLevel(int level)
     {
-        if (loadCanvas != null)
-            loadCanvas.SetActive(false);
+        loadCanvas?.SetActive(false);
 
         if (levels != null && levels.Count > 0)
         {
@@ -101,6 +124,7 @@ public class GameController : MonoBehaviour
 
         currentLevelIndex = level;
         progressAmount = 0;
+
         if (progressSlider != null)
             progressSlider.value = 0;
     }
@@ -115,10 +139,15 @@ public class GameController : MonoBehaviour
     {
         string levelKey = $"LevelCompleted_{currentLevelIndex}";
         PlayerPrefs.SetInt(levelKey, 1);
+        PlayerPrefs.Save();
 
         if (levels != null && levels.Count > 0)
             Debug.Log($"Completed level: {levels[currentLevelIndex].name}");
-
-        PlayerPrefs.Save();
     }
+
+    public static void TriggerWin()
+    {
+        OnPlayerWin?.Invoke();
+    }
+
 }
