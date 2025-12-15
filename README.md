@@ -1,6 +1,6 @@
 # Gem Hunter  
 
-## Setup: Run the build .exe or import project files into unity to run the game
+## Setup: Run the build .exe in the GameBuild folder or import project files into unity to run the game
 ## Youtube link for demo video: https://youtu.be/N4dl7u6BvF4
 ## Features: The game controls with WASD/arrow keys and the spacebar/W/Up arrow for jump. After completing the first two levels a dash is unlocked that is used with the Shift key.  
 ## The goal is to interact with objects in the hubworld to enter platforming levels and complete them in order to grab a gem.
