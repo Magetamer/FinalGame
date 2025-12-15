@@ -1,0 +1,2 @@
+The main challenge of the game was making things persist between scenes, as that is how I loaded new levels. Making platforming levels was the next challenge, I had to make them at least somewhat interesting and with risk of dying involved in a meaningful way.  
+I managed to fix things persisting between scenes by using PlayerPrefs to store the relevant data, and assigned keys to the required sprites and gameobjects so that everything worked as I wanted it to.
